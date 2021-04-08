@@ -1,5 +1,8 @@
 //Get the user to enter in how much their loan is,
 //what is the APR and the loan duration
+//need to enable readLine Synce to get those values
+//Validate all responses **still need to do**
+
 
 
 let readLine = require('readline-sync');
