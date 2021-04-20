@@ -1,53 +1,70 @@
-//Get the user to enter in how much their loan is,
-//what is the APR and the loan duration
-//need to enable readLine Synce to get those values
-//Validate all responses **still need to do**
-
-
-
-let readLine = require('readline-sync');
+const MESSAGES = require('./loan_messages.json');
 
 function prompt(msg) {
-  console.log(`=> ${msg}`);
+  console.log(`==> ${msg}`);
 }
 
-prompt('Welcome to Mortage Calculator!');
+function clean(num) {
+  return num.replace(/[ ,$%]/g, "");
+}
 
+prompt(MESSAGES['welcome']);
+
+let rL = require('readline-sync');
+
+function isInvalidNumber(number) {
+  return number.trim() === '' ||
+         Number(number) <= 0   ||
+         Number.isNaN(Number(number));
+}
 while (true) {
-  prompt(`What is the loan amount?`);
-  let loanAmount = readLine.question();
+  prompt(`What is your loan amount?`);
+  let loanAmount = clean(rL.question());
 
-  prompt(`What is the Annual Percentage Rate`);
-  let APR = readLine.question();
+  while ( isInvalidNumber(loanAmount)) {
+    prompt(MESSAGES['Error']);
+    loanAmount = clean(rL.question());
+  }
+  console.clear();
+  prompt(`What is your APR?`);
+  let APR = clean(rL.question());
 
-  prompt(`What is the loan duration in years?`);
-  let loanDuration = readLine.question();
+  while ( isInvalidNumber(APR) ) {
+    prompt(MESSAGES['Error']);
+    APR = clean(rL.question());
+  }
+  console.clear();
 
-  prompt(`Your loan amount is: $${loanAmount}. Your APR is ${APR}%. Your loan duration is ${loanDuration} years.`);
+  prompt(`What is the loan duration?`);
+  let loanDuration = clean(rL.question());
 
-  let durationInMonths = loanDuration * 12;
-  prompt(`Your loan duration in months is: ${durationInMonths} months.`);
-
-  let annualInterestRate = Number(APR) / 100;
-  //We have to turn 3% into a decimal
-
-  let monthlyInterestRate = annualInterestRate / 12;
-  prompt(`Your monthly interest rate is: ${monthlyInterestRate}%`);
-
-
-  let monthlyPayment = Number(loanAmount) *
-                        (monthlyInterestRate /
-                        (1 - Math.pow((1 + monthlyInterestRate),
-                          (-Number(durationInMonths)))));
-
-  prompt(`Your monthlyPayment is:$${monthlyPayment.toFixed(2)}`);
-
-  prompt("Another calculation?");
-  let answer = readLine.question().toLowerCase();
-  while (answer[0] !== 'n' && answer[0] !== 'y') {
-    prompt('Please enter "y" or "n".');
-    answer = readLine.question().toLowerCase();
+  while ( isInvalidNumber(loanDuration) ) {
+    prompt(MESSAGES['Error']);
+    loanDuration = clean(rL.question());
   }
 
-  if (answer[0] === 'n') break;
+  console.clear();
+
+  let anualIntrestRate = APR / 100;
+  let monthlyInterestRate = anualIntrestRate / 12;
+  let months = Number(loanDuration) * 12;
+
+  let monthlyPayment = loanAmount
+                        * (monthlyInterestRate
+                        / (1 - Math.pow((1 + monthlyInterestRate), (-months))));
+
+  prompt(`Your monthly payments is: $${monthlyPayment.toFixed(2)}`);
+
+  prompt(`Would you like to perform another calculation? y = yes n = no.`);
+  let response = rL.question().toLowerCase();
+  console.clear();
+
+  while (response[0] !== 'y' && response[0] !== 'n' ) {
+    prompt(`Please enter y or n !`);
+    response = rL.question().toLowerCase();
+  }
+  if (response[0] === 'n') {
+    prompt(MESSAGES['Exit']);
+    break;
+  }
 }
